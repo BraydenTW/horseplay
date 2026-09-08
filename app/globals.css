@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --background: #1a1917;
+  --foreground: white;
+}
+
+@theme inline {
+  --color-background: #1a1917;
+
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  @apply text-xl;
+  font-family: var(--font-outfit), Arial, Helvetica, sans-serif;
+}
+
+/* In your globals.css */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 10px;
+    background-color: #000; /* Track color */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #1a1917; /* Thumb color (Tailwind gray-300) */
+    border-radius: 9999px;
+  }
+}
+
+h1 {
+  @apply text-4xl font-bold;
+}
+
+h2 {
+  @apply text-3xl font-bold;
+}
+h3 {
+  @apply text-2xl font-bold;
+}
+
+.btn-basic {
+  @apply px-6 py-4 bg-red-500 border-2 border-red-500 rounded-md;
+}
+
+.btn-secondary {
+  @apply bg-stone-700!  border-stone-700!;
+}
+
+.absolutelyCentered {
+  @apply max-w-3xl m-auto p-6 top-1/2 left-1/2 absolute -translate-1/2 w-full;
+}
+
+input {
+  @apply border-2 rounded-md border-stone-600 px-6 py-4;
+}
+.inputSmall {
+  @apply px-3 py-2;
+}
+
+label {
+  @apply font-medium;
+}
+
+.formItem {
+  @apply space-y-4 flex flex-col justify-start;
+}
