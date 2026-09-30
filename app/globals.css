@@ -5,16 +5,21 @@
   --foreground: white;
 }
 
+@theme {
+  --color-redPink: #FF004D;
+}
+
 @theme inline {
-  --color-background: #1a1917;
+  --font-geist: var(--font-geist-next);
+  --font-boldonse: var(--font-boldonse-next);
 
 }
 
 body {
-  background: var(--background);
+  /* background: black; */
   color: var(--foreground);
-  @apply text-xl;
-  font-family: var(--font-outfit), Arial, Helvetica, sans-serif;
+  @apply text-xl font-geist;
+  /* font-family: var(--font-geist), Arial, Helvetica, sans-serif; */
 }
 
 /* In your globals.css */
@@ -30,6 +35,10 @@ body {
   }
 }
 
+h1, h2, h3, h4{
+  @apply font-boldonse;
+}
+
 h1 {
   @apply text-4xl font-bold;
 }
@@ -40,9 +49,12 @@ h2 {
 h3 {
   @apply text-2xl font-bold;
 }
+h4 {
+  @apply text-xl font-bold;
+}
 
 .btn-basic {
-  @apply px-6 py-4 bg-red-500 border-2 border-red-500 rounded-md;
+  @apply px-6 py-4 bg-redPink border-2 border-redPink rounded-md;
 }
 
 .btn-secondary {
@@ -54,7 +66,7 @@ h3 {
 }
 
 input {
-  @apply border-2 rounded-md border-stone-600 px-6 py-4;
+  @apply border-2 rounded-md border-stone-600 px-4 py-2 font-boldonse text-base;
 }
 .inputSmall {
   @apply px-3 py-2;
@@ -66,4 +78,8 @@ label {
 
 .formItem {
   @apply space-y-4 flex flex-col justify-start;
+}
+
+.makeMissButton {
+  @apply h-24 w-34 font-boldonse text-white font-bold flex flex-col text-xs items-center justify-center rounded-full bg-black border-3;
 }

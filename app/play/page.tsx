@@ -15,19 +15,23 @@ export default function Play() {
     return saved !== null;
   }); // game is started if there is already Game data in local storage. if not, it is false.
   const [gamePresets, setGamePresets] = useState<GamePresets>({
-    players: [],
+    players: [
+      // { name: "brayden", misses: 3, id: 0 },
+      // { name: "temoana", misses: 20, id: 1 },
+      // { name: "teva", misses: 0, id: 2 },
+    ],
     difficulty: null,
     rules: { dunking: false },
     word: "HORSE",
   });
 
-  const startGame = () => { // INITIALIZES GAME
+  const startGame = () => {
+    // INITIALIZES GAME
     setGameStarted(true);
     setGlobalGameData({
       ...globalGameData,
       gamePresets: gamePresets,
-      missesByPlayer: new Array(gamePresets.players.length).fill(0),
-      whoIsUp: gamePresets.players[0]
+      whoIsUp: gamePresets.players[0].name,
     });
   };
 
@@ -40,12 +44,12 @@ export default function Play() {
   const [globalGameData, setGlobalGameData] = useState<GameData>(() => {
     const defaultGameData = {
       gamePresets: gamePresets,
-
-      missesByPlayer: new Array(gamePresets.players.length).fill(0),
-      whoIsUp: gamePresets.players[0],
+      whoIsUp: gamePresets.players[0]?.name || "",
       currentMove: moves[Math.floor(Math.random() * moves.length)],
       howManyHaveMadeCurrentMove: 0,
-      movesThatAreLeft: moves,
+      movesThatAreLeft: moves.map(move => move.id),
+      // gameHistory: null
+      round: 1,
     };
 
     if (typeof window === "undefined") {
@@ -63,8 +67,12 @@ export default function Play() {
 
   useEffect(() => {
     if (!globalGameData) return;
-
-    localStorage.setItem("horseplay-game-data", JSON.stringify(globalGameData));
+    if (gameStarted === true) {
+      localStorage.setItem(
+        "horseplay-game-data",
+        JSON.stringify(globalGameData),
+      );
+    }
   }, [globalGameData]);
 
   if (!hasHydrated || !globalGameData) {
@@ -73,23 +81,18 @@ export default function Play() {
     return <p>loading....</p>;
   }
 
-  return (
-    <div>
-      {gameStarted ? ( // still at least two players alive? show game
-        <GameScreen
-          globalGameData={globalGameData}
-          setGlobalGameData={setGlobalGameData}
-        />
-      ) : (
-        // not setup the game yet?
-        <GameSetup
-          gamePresets={gamePresets}
-          setGamePresets={setGamePresets}
-          startGame={startGame}
-        />
-      )}
-      <button onClick={() => {localStorage.clear()}}>erase data</button>
-    </div>
+  return gameStarted ? ( // still at least two players alive? show game
+    <GameScreen
+      globalGameData={globalGameData}
+      setGlobalGameData={setGlobalGameData}
+    />
+  ) : (
+    // not setup the game yet?
+    <GameSetup
+      gamePresets={gamePresets}
+      setGamePresets={setGamePresets}
+      startGame={startGame}
+    />
   );
 }
 

@@ -59,7 +59,7 @@ export default function GameSetup({
   };
 
   return (
-    <div className="">
+    <div className="p-6">
       <h2>Setup Game</h2>
       <div className="space-y-10 mt-6">
         <div className="formItem">
@@ -71,7 +71,7 @@ export default function GameSetup({
               type="text"
               name="newPlayer"
               value={newPlayer}
-              onChange={(e) => setNewPlayer(e.target.value)}
+              onChange={(e) => setNewPlayer(e.target.value.toUpperCase())}
               id="newPlayer"
             />
             <button
@@ -79,7 +79,7 @@ export default function GameSetup({
               onClick={() => {
                 if (newPlayer.trim() !== "") {
                   const updatedPlayers = gamePresets.players;
-                  updatedPlayers.push(newPlayer);
+                  updatedPlayers.push({ name: newPlayer, misses: 0 });
                   setGamePresets({
                     ...gamePresets,
                     players: updatedPlayers,
@@ -116,10 +116,10 @@ export default function GameSetup({
                   <input
                     className="inputSmall"
                     id={`player-${index}`}
-                    value={gamePresets.players[index]}
+                    value={gamePresets.players[index].name}
                     onChange={(e) => {
                       const updatedPlayers = gamePresets.players.slice(0);
-                      updatedPlayers[index] = e.target.value;
+                      updatedPlayers[index].name = e.target.value.toUpperCase();
                       setGamePresets({
                         ...gamePresets,
                         players: updatedPlayers,

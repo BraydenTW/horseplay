@@ -1,8 +1,12 @@
 import { moves } from "@/data/moves";
 import { GameData, GamePresets, PlayerStats } from "@/lib/types";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import YouTubeClip from "./YoutubeClip";
-import ChooseMove from "./ChooseMove";
+import Header from "./Header";
+import ShotDetails from "./ShotDetails";
+import Footer from "./Footer";
+import MissMakeButtons from "./MissMakeButtons";
+import RoundDetails from "./RoundDetails";
+import Leaderboard from "./Leaderboard";
 
 export default function GameScreen({
   globalGameData,
@@ -13,11 +17,11 @@ export default function GameScreen({
 }) {
   const gamePresets = globalGameData.gamePresets;
   const { currentMove } = globalGameData;
-  const [showChooseMove, setShowChooseMove] = useState<boolean>(false)
-  const [showPlayerButtons, setShowPlayerButtons] = useState<boolean>(false);
 
-  const indexOfCurrentPlayer = gamePresets.players.indexOf(
-    globalGameData.whoIsUp,
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+
+  const indexOfCurrentPlayer = gamePresets.players.findIndex(
+    (player) => player.name === globalGameData.whoIsUp,
   ); // based off the ALL number of players (dead d alive)
 
   function playerMadeIt() {
@@ -33,22 +37,26 @@ export default function GameScreen({
 
       const updatedMovesThatAreLeft =
         globalGameData.movesThatAreLeft.length <= 1
-          ? moves
+          ? moves.map((move) => move.id)
           : globalGameData.movesThatAreLeft
               .slice()
-              .filter((item) => item.id !== currentMove.id);
+              .filter((moveId) => moveId !== currentMove.id);
 
       const newMove =
         updatedMovesThatAreLeft[
           Math.floor(Math.random() * updatedMovesThatAreLeft.length)
         ];
 
+      // const gameHistory = globalGameData.gameHistory
       setGlobalGameData({
+        // New round!
         ...globalGameData,
         movesThatAreLeft: updatedMovesThatAreLeft,
-        currentMove: newMove,
+        currentMove: moves.find((item) => item.id === newMove)!,
         whoIsUp: updatedWhoIsUp,
         howManyHaveMadeCurrentMove: 0,
+        round: globalGameData.round + 1,
+        // gameHistory: gameHistory[gameHistory.length]
       });
     } else {
       setGlobalGameData({
@@ -62,115 +70,114 @@ export default function GameScreen({
   const whoIsUpNext = (currentIndex: number): string => {
     if (currentIndex + 1 === globalGameData.gamePresets.players.length) {
       // if you exceed max list index,
-      if (globalGameData.missesByPlayer[0] < gamePresets.word.length) {
+      if (
+        globalGameData.gamePresets.players[0].misses < gamePresets.word.length
+      ) {
         // check if index 0 is still in
-        return gamePresets.players[0]; // return the first player
+        return gamePresets.players[0].name; // return the first player
       } else {
         // if first player is out, check the next by pretending you are player 0
         return whoIsUpNext(0);
       }
     }
     if (
-      globalGameData.missesByPlayer[currentIndex] >= gamePresets.word.length
+      globalGameData.gamePresets.players[currentIndex].misses >=
+      gamePresets.word.length
     ) // if next player is out, check the one after
     {
       return whoIsUpNext(currentIndex + 1);
     } else {
       // if the next player is still alive, he is up next.
-      return gamePresets.players[currentIndex + 1];
+      return gamePresets.players[currentIndex + 1].name;
     }
   };
 
   function playerMissedIt() {
     const updatedMovesThatAreLeft =
       globalGameData.movesThatAreLeft.length <= 1
-        ? moves
+        ? moves.map((move) => move.id)
         : globalGameData.movesThatAreLeft
             .slice()
-            .filter((item) => item.id !== currentMove.id);
+            .filter((item) => item !== currentMove.id);
     const newMove =
       updatedMovesThatAreLeft[
         Math.floor(Math.random() * updatedMovesThatAreLeft.length)
       ];
 
-    const updatedMissesByPlayer = globalGameData.missesByPlayer.slice();
-
-    updatedMissesByPlayer[indexOfCurrentPlayer] =
-      updatedMissesByPlayer[indexOfCurrentPlayer] + 1;
+    const updatedPlayers = globalGameData.gamePresets.players.slice();
+    updatedPlayers[indexOfCurrentPlayer].misses =
+      updatedPlayers[indexOfCurrentPlayer].misses + 1;
 
     const updatedWhoIsUp = whoIsUpNext(indexOfCurrentPlayer);
 
     setGlobalGameData({
-      ...globalGameData,
+      gamePresets: {
+        ...globalGameData.gamePresets,
+        players: updatedPlayers,
+      },
       movesThatAreLeft: updatedMovesThatAreLeft,
-      currentMove: newMove,
-      missesByPlayer: updatedMissesByPlayer,
+      currentMove: moves.find((item) => item.id === newMove)!,
       whoIsUp: updatedWhoIsUp,
-      howManyHaveMadeCurrentMove: 0
+      round: globalGameData.round + 1,
+      howManyHaveMadeCurrentMove: 0,
     });
   }
 
   const playersLeft = globalGameData.gamePresets.players.filter(
     (item, i) =>
-      globalGameData.missesByPlayer[i] < globalGameData.gamePresets.word.length,
+      globalGameData.gamePresets.players[i].misses <
+      globalGameData.gamePresets.word.length,
   ).length;
 
   return playersLeft >= 2 ? ( // still at least two players alive? show game
-    <div className="">
-      {showChooseMove &&
-        <ChooseMove
-          globalGameData={globalGameData}
-          setGlobalGameData={setGlobalGameData}
+    <div className="min-h-screen flex-col">
+        <Leaderboard
+        showLeaderboard={showLeaderboard}
+          setShowLeaderboard={setShowLeaderboard}
+          players={globalGameData.gamePresets.players}
+          word={gamePresets.word}
         />
-      }
-      <span className="font-black uppercase italic">PLAY!</span>
-      {currentMove && (
-        <div>
-          <h3>
-            {currentMove.name} ({currentMove.difficulty})
-          </h3>
-          <p>By: {currentMove.player}</p>
-          <div className="w-full">
-            <YouTubeClip
-              videoId={currentMove.video.videoId}
-              start={currentMove.video.start}
-              end={currentMove.video.end}
-              onEnd={() => setShowPlayerButtons(true)}
-            />
-          </div>
-          <p className="italic">{currentMove.description}</p>
-          <ul className="list-disc ml-5">
-            {currentMove.rules.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-          <div>
-            Who&apos;s up? <h2>{globalGameData.whoIsUp}</h2>
-          </div>
-          {showPlayerButtons && (
-            <div className="grid grid-cols-2 gap-4">
-              <button className="btn-basic" onClick={playerMadeIt}>
-                Made it!
-              </button>
-              <button className="btn-basic" onClick={playerMissedIt}>
-                Missed
-              </button>
+        {currentMove && (
+          <div className="flex flex-col justify-between h-full">
+            <div>
+              <Header globalGameData={globalGameData} setShowLeaderboard={setShowLeaderboard} />
+              <div className="p-6 pt-0">
+                <RoundDetails
+                  round={globalGameData.round}
+                  howManyHaveMadeCurrentMove={
+                    globalGameData.howManyHaveMadeCurrentMove
+                  }
+                  playersLeft={playersLeft}
+                />
+                <ShotDetails currentMove={currentMove} />
+                <MissMakeButtons
+                  playerMadeIt={playerMadeIt}
+                  playerMissedIt={playerMissedIt}
+                />
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      <Footer
+        showLeaderboard={showLeaderboard}
+        setShowLeaderboard={setShowLeaderboard}
+      />
     </div>
   ) : (
     // one player remaining? winner winner chicken dinner!
     <p>
-      {
-        gamePresets.players[
-          globalGameData.missesByPlayer.findIndex(
-            (item) => item < globalGameData.gamePresets.word.length,
-          )
-        ]
-      }{" "}
+      {globalGameData.gamePresets.players.find((player) => player.misses > 0)
+        ?.name || ""}{" "}
       is the winner!
+      {globalGameData.gamePresets.players[0].misses}
+      <button
+        className="px-2 py-1 mt-2 rounded-md text-xs bg-stone-800"
+        onClick={() => {
+          localStorage.clear();
+        }}
+      >
+        erase data
+      </button>
     </p>
   );
 }
@@ -181,3 +188,35 @@ export default function GameScreen({
 // #    -> Did they make it? Y/N
 // # WIN!  SAVE INTO GAME HISTORY.
 // # RESTART?
+
+{
+  /* {showPlayerButtons && (
+            <div classNsame="grid grid-cols-2 gap-4">
+              <button className="btn-basic" onClick={playerMadeIt}>
+                Made it!
+              </button>
+              <button className="btn-basic" onClick={playerMissedIt}>
+                Missed
+              </button>
+            </div>
+          )} */
+}
+{
+  /* <ul className="list-disc ml-5">
+            {currentMove.rules.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul> */
+}
+
+{
+  /* CHOOSE MOVE FEATURE IF TIME? */
+}
+{
+  /* {showChooseMove &&
+        <ChooseMove
+          globalGameData={globalGameData}
+          setGlobalGameData={setGlobalGameData}
+        />
+      } */
+}

@@ -17,7 +17,7 @@ export const moves: Move[] = [
       "Finish with a layup",
     ],
 
-    difficulty: 2,
+    difficulty: 4,
 
     category: ["layup", "footwork"],
 
@@ -44,7 +44,7 @@ export const moves: Move[] = [
       "Use a floater instead of a normal layup",
     ],
 
-    difficulty: 2,
+    difficulty: 3,
 
     category: ["floater", "layup"],
 

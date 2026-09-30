@@ -1,14 +1,12 @@
-
+export type Player = {
+  name: string;
+  misses: number;
+};
 export type GamePresets = {
-  players: string[];
+  players: Player[];
   difficulty: number | null;
   rules: { dunking: boolean };
   word: string;
-};
-
-export type PlayerStats = {
-  playerId: number;
-  numOfLetters: number;
 };
 
 export type Move = {
@@ -16,21 +14,23 @@ export type Move = {
   name: string;
   player: string;
   description: string;
-  rules: string[]
+  rules: string[];
   difficulty: number;
   category: string[];
   video: {
     videoId: string;
     start: number;
     end: number;
-  }
-}
+  };
+};
 
 export type GameData = {
-  missesByPlayer: number[];
   whoIsUp: string;
   currentMove: Move;
   howManyHaveMadeCurrentMove: number;
-  movesThatAreLeft: Move[];
+  movesThatAreLeft: string[];
   gamePresets: GamePresets;
+  round: number;
+  // gameHistory: {playerName: string, moveId: string, madeIt: boolean}[][] | null;
 };
+// history: round[]
