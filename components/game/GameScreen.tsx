@@ -1,5 +1,5 @@
 import { moves } from "@/data/moves";
-import { GameData, GamePresets, PlayerStats } from "@/lib/types";
+import { GameData, GamePresets } from "@/lib/types";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Header from "./Header";
 import ShotDetails from "./ShotDetails";
