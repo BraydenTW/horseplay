@@ -1,7 +1,22 @@
-export default function WhosUp({currentPlayer}: {currentPlayer: string}) {
+import { Player } from "@/lib/types";
+import PlayerLetters from "./PlayerLetters";
+
+export default function WhosUp({
+  word,
+  currentPlayer,
+}: {
+  word: string;
+  currentPlayer: Player;
+}) {
   return (
     <div>
-      Who&apos;s up? <h4 className="uppercase">{currentPlayer}</h4>
+      <div>
+        <h4 className="uppercase">{currentPlayer.name}</h4>
+        <PlayerLetters
+          word={word}
+          player={currentPlayer}
+        />
+      </div>
     </div>
   );
 }

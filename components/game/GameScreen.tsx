@@ -141,27 +141,25 @@ export default function GameScreen({
           <div className="flex flex-col justify-between h-full">
             <div>
               <Header globalGameData={globalGameData} setShowLeaderboard={setShowLeaderboard} />
-              <div className="p-6 pt-0">
-                <RoundDetails
+                {/* <RoundDetails
                   round={globalGameData.round}
                   howManyHaveMadeCurrentMove={
-                    globalGameData.howManyHaveMadeCurrentMove
+                  globalGameData.howManyHaveMadeCurrentMove
                   }
                   playersLeft={playersLeft}
-                />
+                /> */}
                 <ShotDetails currentMove={currentMove} />
                 <MissMakeButtons
                   playerMadeIt={playerMadeIt}
                   playerMissedIt={playerMissedIt}
                 />
-              </div>
             </div>
           </div>
         )}
-      <Footer
+      {/* <Footer
         showLeaderboard={showLeaderboard}
         setShowLeaderboard={setShowLeaderboard}
-      />
+      /> */}
     </div>
   ) : (
     // one player remaining? winner winner chicken dinner!

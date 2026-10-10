@@ -8,16 +8,16 @@ export default function MissMakeButtons({
   playerMissedIt: () => void;
 }) {
   return (
-    <div className="flex items-center justify-center space-x-6">
+    <div className="flex items-center justify-center space-x-6 -mt-16">
       <button
-        className="makeMissButton  border-green-500"
+        className="makeMissButton active:bg-green/20! backdrop-blur-md! border-green-500 shadow-2xl shadow-green-500"
         onClick={playerMadeIt}
       >
         <FlameIcon className="text-green-500 mb-3" size={30} />
         MADE IT!
       </button>
       <button
-        className="makeMissButton text-redPink border-redPink"
+        className="makeMissButton active:bg-redPink/20! backdrop-blur-md! text-redPink border-redPink shadow-2xl shadow-redPink"
         onClick={playerMissedIt}
       >
         <span className="mb-3">

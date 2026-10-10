@@ -6,14 +6,14 @@ export default function ShotDifficulty({ difficulty }: { difficulty: number }) {
   return (
     <div className="bg-black rounded-full w-auto px-2 py-1 text-sm inline-flex flex-row items-center space-x-2 justify-center font-bold mb-4">
       <span className={`text-[${difficultyColor}]`}>{difficultyLabel}</span>
-      {new Array(difficulty).fill("⭐️").map((i, index) => (
-        <BballSVG key={index} color={difficultyColor} />
+      {new Array(5).fill("⭐️").map((i, index) => (
+        <BballSVG key={index} color={difficultyColor} faded={index >= difficulty} />
       ))}
     </div>
   );
 }
 
-function BballSVG({ color }: { color: string }) {
+function BballSVG({ color, faded }: { color: string, faded: boolean }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,6 +22,7 @@ function BballSVG({ color }: { color: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
+      opacity={faded ? "20%" : "100%"}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

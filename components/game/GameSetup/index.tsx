@@ -2,6 +2,7 @@
 
 import { GamePresets } from "@/lib/types";
 import { CircleAlert, FileExclamationPoint, XIcon } from "lucide-react";
+import Image from "next/image";
 import {
   Dispatch,
   SetStateAction,
@@ -9,6 +10,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import PlayerList from "./PlayerList";
 
 const numOfDifficulties = 5;
 
@@ -22,8 +24,17 @@ const gameWords = [
     img: "🐷",
   },
   {
-    word: "HIPPOPATOMUS",
-    img: "🦛",
+    word: "PLATYPUS",
+    img: (
+      <Image
+        src="/perry.png"
+        width={20}
+        height={20}
+        objectFit="cover"
+        className="h-12 w-12 rounded-full"
+        alt={"Perry the Platypus"}
+      />
+    ),
   },
 ];
 
@@ -33,6 +44,9 @@ const gameWords = [
 //     id: "dunking",
 //   },
 // ];
+
+// RULES: no blank names, no duplicate names, max 15 characters.
+//
 
 export default function GameSetup({
   gamePresets,
@@ -47,13 +61,29 @@ export default function GameSetup({
     useState<boolean>(false);
   const [newPlayer, setNewPlayer] = useState<string>("");
 
-  const playerLengthError =
-    gamePresets.players.length < 2 ? "At least 2 players need to play" : "";
-  const difficultyError =
-    gamePresets.difficulty === null ? "Choose a difficulty" : "";
+  const playerNames: string[] = gamePresets.players.map((item) => item.name);
+  const notEnoughPlayers = playerNames.length < 2;
+  const playerNameTooLong =
+    playerNames.filter((item) => item.length > 10).length > 0;
+  const playerNameTooShort =
+    playerNames.filter((item) => item.length < 1).length > 0;
+
+  const duplicatePlayerNames = new Set(playerNames).size !== playerNames.length; // looks for duplicates
+  const playerListErrors = {
+    notEnoughPlayers,
+    playerNameTooLong,
+    duplicatePlayerNames,
+    playerNameTooShort,
+  };
+  const thereAreErrors =
+    notEnoughPlayers ||
+    playerNameTooLong ||
+    duplicatePlayerNames ||
+    playerNameTooShort;
+
   const validateGameSetup = () => {
     setAlreadySubmittedOnce(true);
-    if (playerLengthError === "" && difficultyError === "") {
+    if (!thereAreErrors) {
       startGame();
     }
   };
@@ -61,18 +91,18 @@ export default function GameSetup({
   return (
     <div className="p-6">
       <h2>Setup Game</h2>
-      <div className="space-y-10 mt-6">
+      <div className="space-y-6 mt-6">
         <div className="formItem">
-          <label htmlFor="newPlayer">
-            Players ({gamePresets.players.length})
-          </label>
+          <label htmlFor="newPlayer">Who's playing?</label>
           <div className="flex items-center w-full space-x-2">
             <input
               type="text"
               name="newPlayer"
               value={newPlayer}
+              maxLength={10}
               onChange={(e) => setNewPlayer(e.target.value.toUpperCase())}
               id="newPlayer"
+              placeholder="Lebron"
             />
             <button
               className="btn-basic btn-secondary"
@@ -91,47 +121,15 @@ export default function GameSetup({
               Add
             </button>
           </div>
-          <div className="space-y-2">
-            {gamePresets.players.map((item, index) => {
-              return (
-                <div key={index} className="flex items-center space-x-2 w-full">
-                  <button
-                    className="w-10 h-10 rounded-full flex items-center justify-center bg-stone-800"
-                    onClick={(e) => {
-                      const updatedPlayers = gamePresets.players;
-                      console.log(updatedPlayers);
-                      // alert(index)
-
-                      setGamePresets({
-                        ...gamePresets,
-                        players: updatedPlayers.filter(
-                          (updatedPlayerItem, updatedPlayerIndex) =>
-                            index !== updatedPlayerIndex,
-                        ),
-                      });
-                    }}
-                  >
-                    <XIcon />
-                  </button>
-                  <input
-                    className="inputSmall"
-                    id={`player-${index}`}
-                    value={gamePresets.players[index].name}
-                    onChange={(e) => {
-                      const updatedPlayers = gamePresets.players.slice(0);
-                      updatedPlayers[index].name = e.target.value.toUpperCase();
-                      setGamePresets({
-                        ...gamePresets,
-                        players: updatedPlayers,
-                      });
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
         </div>
-        <div className="formItem">
+        <PlayerList
+          gamePresets={gamePresets}
+          setGamePresets={setGamePresets}
+          alreadySubmittedOnce={alreadySubmittedOnce}
+          playerListErrors={playerListErrors}
+        />
+              {<hr className="text-stone-500 mb-6" />}
+        {/* <div className="formItem">
           <label>Difficulty (1 = Noob, 5 = Goat)</label>
 
           <div className="flex flex-row items-start space-x-5">
@@ -162,8 +160,8 @@ export default function GameSetup({
               );
             })}
           </div>
-        </div>
-        <div className="formItem">
+        </div> */}
+        {/* <div className="formItem">
           <label>Game Rules: </label>
           <div className="flex items-center space-x-4">
             <label>Include dunking?</label>
@@ -184,15 +182,15 @@ export default function GameSetup({
               ></div>
             </button>
           </div>
-        </div>
+        </div> */}
         <div className="formItem">
           <label>Game Word</label>
-          <div className="flex flex-col items-start space-y-6">
+          <div className="grid grid-cols-3">
             {gameWords.map((item, index) => {
               return (
                 <div
                   key={index}
-                  className="flex flex-row items-center space-x-2"
+                  className="flex flex-col items-center space-x-2"
                 >
                   <input
                     name={`word`}
@@ -206,14 +204,14 @@ export default function GameSetup({
                   />
                   <label
                     htmlFor={item.word}
-                    className="flex flex-row items-center space-x-6"
+                    className="flex flex-col items-center justify-center text-sm"
                   >
                     <div
-                      className={`outline-2 ${gamePresets.word === item.word ? "outline-white" : "outline-white/10"} rounded-full w-12 h-12 flex items-center justify-center mr-4`}
+                      className={`outline-2 ${gamePresets.word === item.word ? "outline-white" : "outline-white/10"} text-3xl rounded-full w-16 h-16 flex items-center justify-center mb-4`}
                     >
                       {item.img}
                     </div>
-                    {item.word} ({item.word.length})
+                    {item.word}
                   </label>
                 </div>
               );
@@ -223,25 +221,15 @@ export default function GameSetup({
         <div className="formItem">
           <button
             type="submit"
-            className="btn-basic"
+            className="btn-basic "
             onClick={(e) => {
               validateGameSetup();
             }}
           >
             Play!
           </button>
-          {alreadySubmittedOnce && (
-            <div className="pt-2 flex flex-row items-start flex-wrap gap-3">
-              <CircleAlert />
-              <div className="-mt-1 ml-4">
-                {playerLengthError !== "" ? <li>{playerLengthError}</li> : null}
-                {difficultyError !== "" ? <li>{difficultyError}</li> : null}
-              </div>
-            </div>
-          )}
         </div>
       </div>
-      {/* which word? HORSE, PIG, HIPPOPATOMUS RADIO */}
     </div>
   );
 }

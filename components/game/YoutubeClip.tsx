@@ -14,10 +14,10 @@ export default function YouTubeClip({
   onEnd,
 }: VideoProps) {
   return (
-    <div className="mt-4 shadow-none shadow-amber-700/50  border-stone-600 border-2 rounded-3xl overflow-hidden">
+    <div className="mt-4  overflow-hidden">
       <YouTube
         videoId={videoId}
-        iframeClassName="w-full h-64"
+        iframeClassName="w-full h-64 overflow-hidden rounded-md"
         opts={{
           playerVars: {
             autoplay: 1,
@@ -25,6 +25,7 @@ export default function YouTubeClip({
             end,
           },
         }}
+        
         onEnd={onEnd}
       />
     </div>

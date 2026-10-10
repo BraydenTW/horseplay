@@ -2,10 +2,10 @@ import { Move } from "@/lib/types";
 
 export const moves: Move[] = [
   {
-    id: "wade-euro-step",
+    id: "reverse-jelly-layup",
 
-    name: "Euro Step Layup",
-    player: "Dwyane Wade",
+    name: "Reverse Jelly Layup",
+    player: "Kyrie Irving",
 
     description:
       "Drive toward the basket, change direction with a two-step Euro step, and finish at the rim.",
@@ -22,9 +22,9 @@ export const moves: Move[] = [
     category: ["layup", "footwork"],
 
     video: {
-      videoId: "4i1j_G5FaM4",
-      start: 56,
-      end: 60,
+      videoId: "6yq7gfPXXvg",
+      start: 20,
+      end: 27,
     },
   },
 

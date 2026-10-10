@@ -54,7 +54,7 @@ h4 {
 }
 
 .btn-basic {
-  @apply px-6 py-4 bg-redPink border-2 border-redPink rounded-md;
+  @apply px-6 py-4 bg-redPink border-2 border-redPink rounded-md hover:bg-redPink/50 active:bg-redPink/50;
 }
 
 .btn-secondary {
@@ -66,7 +66,7 @@ h4 {
 }
 
 input {
-  @apply border-2 rounded-md border-stone-600 px-4 py-2 font-boldonse text-base;
+  @apply border-2 rounded-md border-stone-600 px-4 py-2 font-geist text-base;
 }
 .inputSmall {
   @apply px-3 py-2;
