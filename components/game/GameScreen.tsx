@@ -7,6 +7,18 @@ import Footer from "./Footer";
 import MissMakeButtons from "./MissMakeButtons";
 import RoundDetails from "./RoundDetails";
 import Leaderboard from "./Leaderboard";
+import ShotFeedback from "./ShotFeedback";
+
+type Feedback = {
+  made: boolean;
+  playerName: string;
+  nextPlayerName?: string;
+  earnedLetter?: string;
+  eliminated?: boolean;
+  winnerName?: string;
+  gameWord?: string;
+  lettersEarned?: number;
+};
 
 export default function GameScreen({
   globalGameData,
@@ -20,10 +32,14 @@ export default function GameScreen({
 
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
   const indexOfCurrentPlayer = gamePresets.players.findIndex(
     (player) => player.name === globalGameData.whoIsUp,
   ); // based off the ALL number of players (dead d alive)
 
+  const numOfMissesCurrentPlayer =
+    globalGameData.gamePresets.players[indexOfCurrentPlayer].misses;
   function playerMadeIt() {
     // if
     const updatedWhoIsUp = whoIsUpNext(indexOfCurrentPlayer);
@@ -46,6 +62,14 @@ export default function GameScreen({
         updatedMovesThatAreLeft[
           Math.floor(Math.random() * updatedMovesThatAreLeft.length)
         ];
+
+      setFeedback({
+        made: true,
+        playerName: globalGameData.whoIsUp,
+        nextPlayerName: updatedWhoIsUp,
+        gameWord: globalGameData.gamePresets.word,
+        lettersEarned: numOfMissesCurrentPlayer,
+      });
 
       // const gameHistory = globalGameData.gameHistory
       setGlobalGameData({
@@ -110,6 +134,15 @@ export default function GameScreen({
 
     const updatedWhoIsUp = whoIsUpNext(indexOfCurrentPlayer);
 
+    setFeedback({
+      made: false,
+      playerName: globalGameData.whoIsUp,
+      nextPlayerName: updatedWhoIsUp,
+      eliminated: numOfMissesCurrentPlayer == gamePresets.word.length,
+      gameWord: globalGameData.gamePresets.word,
+      lettersEarned: numOfMissesCurrentPlayer,
+    });
+
     setGlobalGameData({
       gamePresets: {
         ...globalGameData.gamePresets,
@@ -131,31 +164,46 @@ export default function GameScreen({
 
   return playersLeft >= 2 ? ( // still at least two players alive? show game
     <div className="min-h-screen flex-col">
-        <Leaderboard
+      <ShotFeedback
+        open={feedback !== null}
+        made={feedback?.made ?? false}
+        playerName={feedback?.playerName ?? ""}
+        nextPlayerName={feedback?.nextPlayerName}
+        earnedLetter={feedback?.earnedLetter}
+        eliminated={feedback?.eliminated}
+        winnerName={feedback?.winnerName}
+        onContinue={() => setFeedback(null)}
+        gameWord={feedback?.gameWord ?? "HORSE"}
+        lettersEarned={feedback?.lettersEarned ?? 0}
+      />
+      <Leaderboard
         showLeaderboard={showLeaderboard}
-          setShowLeaderboard={setShowLeaderboard}
-          players={globalGameData.gamePresets.players}
-          word={gamePresets.word}
-        />
-        {currentMove && (
-          <div className="flex flex-col justify-between h-full">
-            <div>
-              <Header globalGameData={globalGameData} setShowLeaderboard={setShowLeaderboard} />
-                {/* <RoundDetails
+        setShowLeaderboard={setShowLeaderboard}
+        players={globalGameData.gamePresets.players}
+        word={gamePresets.word}
+      />
+      {currentMove && (
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            <Header
+              globalGameData={globalGameData}
+              setShowLeaderboard={setShowLeaderboard}
+            />
+            {/* <RoundDetails
                   round={globalGameData.round}
                   howManyHaveMadeCurrentMove={
                   globalGameData.howManyHaveMadeCurrentMove
                   }
                   playersLeft={playersLeft}
                 /> */}
-                <ShotDetails currentMove={currentMove} />
-                <MissMakeButtons
-                  playerMadeIt={playerMadeIt}
-                  playerMissedIt={playerMissedIt}
-                />
-            </div>
+            <ShotDetails currentMove={currentMove} />
+            <MissMakeButtons
+              playerMadeIt={playerMadeIt}
+              playerMissedIt={playerMissedIt}
+            />
           </div>
-        )}
+        </div>
+      )}
       {/* <Footer
         showLeaderboard={showLeaderboard}
         setShowLeaderboard={setShowLeaderboard}
