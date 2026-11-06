@@ -8,6 +8,7 @@ import MissMakeButtons from "./MissMakeButtons";
 import RoundDetails from "./RoundDetails";
 import Leaderboard from "./Leaderboard";
 import ShotFeedback from "./ShotFeedback";
+import { useRouter } from "next/navigation";
 
 type Feedback = {
   made: boolean;
@@ -29,6 +30,7 @@ export default function GameScreen({
 }) {
   const gamePresets = globalGameData.gamePresets;
   const { currentMove } = globalGameData;
+  const router = useRouter();
 
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
@@ -220,9 +222,10 @@ export default function GameScreen({
         className="px-2 py-1 mt-2 rounded-md text-xs bg-stone-800"
         onClick={() => {
           localStorage.clear();
+          router.push('/')
         }}
       >
-        erase data
+        Play Again.
       </button>
     </p>
   );

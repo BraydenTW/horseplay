@@ -14,8 +14,8 @@ export default function ShotDetails({ currentMove }: { currentMove: Move }) {
       <div className="w-full">
         <YouTubeClip
           videoId={currentMove.video.videoId}
-          start={currentMove.video.start}
-          end={currentMove.video.end}
+          start={currentMove.video.start || 0}
+          end={currentMove.video.end || 10000000}
           // onEnd={() => setShowPlayerButtons(true)}
         />
       </div>

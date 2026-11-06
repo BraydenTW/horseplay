@@ -19,8 +19,8 @@ export type Move = {
   category: string[];
   video: {
     videoId: string;
-    start: number;
-    end: number;
+    start: number | null;
+    end: number | null;
   };
 };
 
